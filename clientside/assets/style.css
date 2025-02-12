@@ -10,7 +10,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #121212;
   color: #ffffff;
   font-family: "Arial", sans-serif;
@@ -227,6 +227,7 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
+  color: black;
   text-align: center;
   z-index: 1000;
 }
@@ -329,6 +330,13 @@ body {
   grid-template-rows: repeat(8, 50px);
   gap: 5px;
   margin: 20px 0;
+}
+
+#hexaria-board {
+  margin: 20px 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hexagon {

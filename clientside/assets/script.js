@@ -79,6 +79,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function initializeGame(level, player1Name, player2Name) {
     hexariaBoard.innerHTML = "";
     hexagons = [];
+    let disabledHexagonCount;
+
+    switch (level) {
+      case "easy":
+        disabledHexagonCount = 4;
+        break;
+      case "medium":
+        disabledHexagonCount = 6;
+        break;
+      case "hard":
+        disabledHexagonCount = 8;
+        break;
+    }
+
     for (let i = 0; i < 80; i++) {
       const hexagon = document.createElement("div");
       hexagon.className = "hexagon";
@@ -86,7 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
       hexagons.push(hexagon);
       hexariaBoard.appendChild(hexagon);
     }
+
+    // Randomly disable hexagons
+    for (let i = 0; i < disabledHexagonCount; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * hexagons.length);
+      } while (hexagons[randomIndex].classList.contains("disabled"));
+      hexagons[randomIndex].classList.add("disabled");
+    }
+
     updateCurrentHexagon();
+    updateTurnIndicator();
     if (player2Name === "Bot") {
       setTimeout(botMove, 1000);
     }
@@ -101,16 +126,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const hexagon = hexagons[index];
     if (
       !hexagon.classList.contains("red") &&
-      !hexagon.classList.contains("blue")
+      !hexagon.classList.contains("blue") &&
+      !hexagon.classList.contains("disabled")
     ) {
       hexagon.classList.add(currentPlayer);
       hexagon.innerText = currentHexagonValue;
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
+      updateTurnIndicator();
       if (document.getElementById("player2-name-display").innerText === "Bot") {
         setTimeout(botMove, 1000);
       }
+      checkGameOver();
     }
   }
 
@@ -135,7 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const emptyHexagons = hexagons.filter(
       (hexagon) =>
         !hexagon.classList.contains("red") &&
-        !hexagon.classList.contains("blue")
+        !hexagon.classList.contains("blue") &&
+        !hexagon.classList.contains("disabled")
     );
     if (emptyHexagons.length > 0) {
       const randomIndex = Math.floor(Math.random() * emptyHexagons.length);
@@ -145,7 +174,42 @@ document.addEventListener("DOMContentLoaded", () => {
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
+      updateTurnIndicator();
+      checkGameOver();
     }
+  }
+
+  function checkGameOver() {
+    const allFilled = hexagons.every(
+      (hexagon) =>
+        hexagon.classList.contains("red") ||
+        hexagon.classList.contains("blue") ||
+        hexagon.classList.contains("disabled")
+    );
+    if (allFilled) {
+      const winner = player1Score > player2Score ? "Player 1" : "Player 2";
+      showGameOver(winner, player1Score, player2Score);
+    }
+  }
+
+  function showGameOver(winner, player1Score, player2Score) {
+    const gameOverElement = document.createElement("div");
+    gameOverElement.className = "game-over";
+    gameOverElement.innerHTML = `
+      <h2>Game Over</h2>
+      <p>Winner: ${winner}</p>
+      <p>Player 1 Score: ${player1Score}</p>
+      <p>Player 2 Score: ${player2Score}</p>
+      <button class="restart-game">Restart Game</button>
+    `;
+    document.body.appendChild(gameOverElement);
+
+    document.querySelector(".restart-game").addEventListener("click", () => {
+      document.body.removeChild(gameOverElement);
+      initializeGame();
+    });
+
+    saveScore(winner, winner === "Player 1" ? player1Score : player2Score);
   }
 
   // Fungsi untuk menampilkan countdown
@@ -398,17 +462,77 @@ document.addEventListener("DOMContentLoaded", () => {
   let player2Score = 0;
   let hexagons = [];
 
-  function initializeGame() {
-    hexariaBoard.innerHTML = "";
-    hexagons = [];
-    for (let i = 0; i < 80; i++) {
-      const hexagon = document.createElement("div");
-      hexagon.className = "hexagon";
-      hexagon.addEventListener("click", () => placeHexagon(i));
-      hexagons.push(hexagon);
-      hexariaBoard.appendChild(hexagon);
+  const canvas = document.getElementById("hexaria-board");
+  const ctx = canvas.getContext("2d");
+  const hexRadius = 25;
+  const hexHeight = Math.sqrt(3) * hexRadius;
+  const hexWidth = 2 * hexRadius;
+  let isPlayerTurn = true;
+
+  function drawHexagon(x, y, color, value) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      ctx.lineTo(
+        x + hexRadius * Math.cos((Math.PI / 3) * i),
+        y + hexRadius * Math.sin((Math.PI / 3) * i)
+      );
     }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.stroke();
+    if (value) {
+      ctx.fillStyle = "#000";
+      ctx.fillText(value, x - 5, y + 5);
+    }
+  }
+
+  function initializeGame(level, player1Name, player2Name) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hexagons.length = 0;
+    let disabledHexagonCount;
+
+    switch (level) {
+      case "easy":
+        disabledHexagonCount = 4;
+        break;
+      case "medium":
+        disabledHexagonCount = 6;
+        break;
+      case "hard":
+        disabledHexagonCount = 8;
+        break;
+    }
+
+    const offsetX =
+      (canvas.width - (10 * hexWidth * 0.75 + hexRadius * 0.25)) / 2;
+    const offsetY = (canvas.height - 8 * hexHeight) / 2;
+
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 10; col++) {
+        const x = col * hexWidth * 0.75 + hexRadius + offsetX;
+        const y =
+          row * hexHeight + (col % 2 === 0 ? hexHeight / 2 : 0) + offsetY;
+        const hexagon = { x, y, color: "#ccc", value: null, disabled: false };
+        hexagons.push(hexagon);
+        drawHexagon(x, y, hexagon.color);
+      }
+    }
+
+    for (let i = 0; i < disabledHexagonCount; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * hexagons.length);
+      } while (hexagons[randomIndex].disabled);
+      hexagons[randomIndex].disabled = true;
+      drawHexagon(hexagons[randomIndex].x, hexagons[randomIndex].y, "gray");
+    }
+
     updateCurrentHexagon();
+    updateTurnIndicator();
+    if (player2Name === "Bot") {
+      setTimeout(botMove, 1000);
+    }
   }
 
   function updateCurrentHexagon() {
@@ -417,24 +541,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function placeHexagon(index) {
+    if (!isPlayerTurn) return;
+
     const hexagon = hexagons[index];
     if (
-      !hexagon.classList.contains("red") &&
-      !hexagon.classList.contains("blue")
+      !hexagon.color.includes("red") &&
+      !hexagon.color.includes("blue") &&
+      !hexagon.disabled
     ) {
-      hexagon.classList.add(currentPlayer);
-      hexagon.innerText = currentHexagonValue;
+      hexagon.color = currentPlayer;
+      hexagon.value = currentHexagonValue;
+      drawHexagon(hexagon.x, hexagon.y, hexagon.color, hexagon.value);
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
+      updateTurnIndicator();
+      isPlayerTurn = false;
       if (document.getElementById("player2-name-display").innerText === "Bot") {
         setTimeout(botMove, 1000);
       }
+      checkGameOver();
     }
   }
 
   function switchPlayer() {
     currentPlayer = currentPlayer === "red" ? "blue" : "red";
+    isPlayerTurn = true;
   }
 
   function updateScore() {
@@ -446,26 +578,120 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function calculateScore(player) {
     return hexagons
-      .filter((hexagon) => hexagon.classList.contains(player))
-      .reduce((sum, hexagon) => sum + parseInt(hexagon.innerText), 0);
+      .filter((hexagon) => hexagon.color === player)
+      .reduce((sum, hexagon) => sum + hexagon.value, 0);
   }
 
   function botMove() {
     const emptyHexagons = hexagons.filter(
       (hexagon) =>
-        !hexagon.classList.contains("red") &&
-        !hexagon.classList.contains("blue")
+        !hexagon.color.includes("red") &&
+        !hexagon.color.includes("blue") &&
+        !hexagon.disabled
     );
     if (emptyHexagons.length > 0) {
       const randomIndex = Math.floor(Math.random() * emptyHexagons.length);
       const hexagon = emptyHexagons[randomIndex];
-      hexagon.classList.add(currentPlayer);
-      hexagon.innerText = currentHexagonValue;
+      hexagon.color = currentPlayer;
+      hexagon.value = currentHexagonValue;
+      drawHexagon(hexagon.x, hexagon.y, hexagon.color, hexagon.value);
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
+      updateTurnIndicator();
+      checkGameOver();
     }
   }
+
+  function updateTurnIndicator() {
+    const currentTurnElement = document.getElementById("current-turn");
+    if (currentPlayer === "red") {
+      currentTurnElement.innerText = "Player 1";
+    } else if (currentPlayer === "blue") {
+      currentTurnElement.innerText = "Player 2";
+    } else {
+      currentTurnElement.innerText = "Bot";
+    }
+  }
+
+  function checkGameOver() {
+    const allFilled = hexagons.every(
+      (hexagon) =>
+        hexagon.color.includes("red") ||
+        hexagon.color.includes("blue") ||
+        hexagon.disabled
+    );
+    if (allFilled) {
+      const winner = player1Score > player2Score ? "Player 1" : "Player 2";
+      showGameOver(winner, player1Score, player2Score);
+    }
+  }
+
+  function showGameOver(winner, player1Score, player2Score) {
+    const gameOverElement = document.createElement("div");
+    gameOverElement.className = "game-over";
+    gameOverElement.innerHTML = `
+      <h2>Game Over</h2>
+      <p>Winner: ${winner}</p>
+      <p>Player 1 Score: ${player1Score}</p>
+      <p>Player 2 Score: ${player2Score}</p>
+      <button class="restart-game">Restart Game</button>
+    `;
+    document.body.appendChild(gameOverElement);
+
+    document.querySelector(".restart-game").addEventListener("click", () => {
+      document.body.removeChild(gameOverElement);
+      initializeGame();
+    });
+
+    saveScore(winner, winner === "Player 1" ? player1Score : player2Score);
+  }
+
+  function saveScore(username, score) {
+    const matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+    matchHistory.push({ username, score, date: new Date() });
+    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
+    updateLeaderboard();
+  }
+
+  function updateLeaderboard() {
+    const matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+    leaderboardContent.innerHTML = "";
+    matchHistory.forEach((match) => {
+      const item = document.createElement("div");
+      item.className = "leaderboard-item";
+      item.innerHTML = `
+        <span>${match.username}: ${match.score}</span>
+        <button onclick="showDetails('${match.username}', ${match.score})">Details</button>
+      `;
+      leaderboardContent.appendChild(item);
+    });
+  }
+
+  sortScoreButton.addEventListener("click", () => {
+    const matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+    matchHistory.sort((a, b) => b.score - a.score);
+    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
+    updateLeaderboard();
+  });
+
+  window.showDetails = (username, score) => {
+    alert(`Username: ${username}\nScore: ${score}`);
+  };
+
+  canvas.addEventListener("click", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    hexagons.forEach((hexagon, index) => {
+      if (
+        Math.sqrt((x - hexagon.x) ** 2 + (y - hexagon.y) ** 2) < hexRadius &&
+        !hexagon.disabled
+      ) {
+        placeHexagon(index);
+      }
+    });
+  });
 
   newGameButton.addEventListener("click", initializeGame);
 
