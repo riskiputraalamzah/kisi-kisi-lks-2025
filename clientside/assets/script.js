@@ -79,15 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function initializeGame(level, player1Name, player2Name) {
     hexariaBoard.innerHTML = "";
     hexagons = [];
-    const disabledHexagons = getDisabledHexagons(level);
     for (let i = 0; i < 80; i++) {
       const hexagon = document.createElement("div");
       hexagon.className = "hexagon";
-      if (disabledHexagons.includes(i)) {
-        hexagon.classList.add("disabled");
-      } else {
-        hexagon.addEventListener("click", () => placeHexagon(i));
-      }
+      hexagon.addEventListener("click", () => placeHexagon(i));
       hexagons.push(hexagon);
       hexariaBoard.appendChild(hexagon);
     }
@@ -95,15 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player2Name === "Bot") {
       setTimeout(botMove, 1000);
     }
-  }
-
-  function getDisabledHexagons(level) {
-    const count = level === "easy" ? 4 : level === "medium" ? 6 : 8;
-    const disabledHexagons = new Set();
-    while (disabledHexagons.size < count) {
-      disabledHexagons.add(Math.floor(Math.random() * 80));
-    }
-    return Array.from(disabledHexagons);
   }
 
   function updateCurrentHexagon() {
@@ -405,7 +391,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const player2ScoreElement = document.getElementById("player2-score");
   const currentHexagonElement = document.getElementById("current-hexagon");
   const newGameButton = document.getElementById("new-game");
-  const currentTurnElement = document.getElementById("current-turn");
 
   let currentPlayer = "red";
   let currentHexagonValue = 1;
@@ -413,54 +398,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let player2Score = 0;
   let hexagons = [];
 
-  function initializeGame(level, player1Name, player2Name) {
+  function initializeGame() {
     hexariaBoard.innerHTML = "";
     hexagons = [];
-    const disabledHexagons = getDisabledHexagons(level);
     for (let i = 0; i < 80; i++) {
       const hexagon = document.createElement("div");
       hexagon.className = "hexagon";
-      if (disabledHexagons.includes(i)) {
-        hexagon.classList.add("disabled");
-      } else {
-        hexagon.addEventListener("click", () => placeHexagon(i));
-      }
+      hexagon.addEventListener("click", () => placeHexagon(i));
       hexagons.push(hexagon);
       hexariaBoard.appendChild(hexagon);
     }
     updateCurrentHexagon();
-    updateTurnIndicator();
-  }
-
-  function getDisabledHexagons(level) {
-    const count = level === "easy" ? 4 : level === "medium" ? 6 : 8;
-    const disabledHexagons = new Set();
-    while (disabledHexagons.size < count) {
-      disabledHexagons.add(Math.floor(Math.random() * 80));
-    }
-    return Array.from(disabledHexagons);
   }
 
   function updateCurrentHexagon() {
     currentHexagonValue = Math.floor(Math.random() * 20) + 1;
     currentHexagonElement.innerText = `Current Hexagon: ${currentPlayer} ${currentHexagonValue}`;
-  }
-
-  function updateTurnIndicator() {
-    const playerName = currentPlayer === "red" ? "Player 1" : "Player 2";
-    currentTurnElement.innerText = playerName;
-    showTurnIndicatorAnimation(playerName);
-  }
-
-  function showTurnIndicatorAnimation(playerName) {
-    const turnIndicator = document.createElement("div");
-    turnIndicator.className = "turn-indicator-animation";
-    turnIndicator.innerText = `${playerName}'s Turn`;
-    document.querySelector(".hexaria-container").appendChild(turnIndicator);
-
-    setTimeout(() => {
-      document.querySelector(".hexaria-container").removeChild(turnIndicator);
-    }, 2000);
   }
 
   function placeHexagon(index) {
@@ -474,7 +427,6 @@ document.addEventListener("DOMContentLoaded", () => {
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
-      updateTurnIndicator();
       if (document.getElementById("player2-name-display").innerText === "Bot") {
         setTimeout(botMove, 1000);
       }
@@ -512,20 +464,10 @@ document.addEventListener("DOMContentLoaded", () => {
       updateScore();
       switchPlayer();
       updateCurrentHexagon();
-      updateTurnIndicator();
     }
   }
 
-  newGameButton.addEventListener("click", () => {
-    const player1Name = document.getElementById(
-      "player1-name-display"
-    ).innerText;
-    const player2Name = document.getElementById(
-      "player2-name-display"
-    ).innerText;
-    const gameLevel = document.getElementById("game-level").value;
-    initializeGame(gameLevel, player1Name, player2Name);
-  });
+  newGameButton.addEventListener("click", initializeGame);
 
   initializeGame();
 });
