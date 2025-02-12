@@ -18,16 +18,16 @@ body {
     "one five three"
     "one five four"
     "six five seven"
-    "eight nine seven"
-    "eight nine seven";
+    "nine eight seven"
+    "nine eight seven";
 }
 
 .box {
-  min-height: 150px;
-  background-color: grey !important;
+  min-height: 70px;
+  background-color: rgb(190, 190, 190) !important;
   border: 1px solid #000;
   margin: 10px;
-  border-radius: 5px;
+  border-radius: 2px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,7 +42,7 @@ body {
   grid-area: two;
 }
 .three {
-  min-height: 200px !important;
+  min-height: 100px !important;
   grid-area: three;
 }
 .four {
@@ -58,10 +58,10 @@ body {
   grid-area: seven;
 }
 .eight {
-  min-height: 200px !important;
+  min-height: 100px !important;
   grid-area: eight;
 }
 .nine {
-  min-height: 200px !important;
+  min-height: 100px !important;
   grid-area: nine;
 }
