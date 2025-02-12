@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexaria Game</title>
+
+    <!-- Link ke file CSS -->
+    <link rel="stylesheet" href="./assets/style.css" />
+  </head>
+  <body>
+    <div id="welcome-screen" class="welcome-screen">
+      <div class="welcome-content">
+        <h1>Welcome to Hexaria</h1>
+        <div class="form-group">
+          <label for="player1-name">Player 1 Name:</label>
+          <input
+            type="text"
+            id="player1-name"
+            placeholder="Player 1 Name"
+            autocomplete="off"
+            autocapitalize="on"
+          />
+        </div>
+        <div class="form-group">
+          <label for="player2-name">Player 2 Name (or select Bot):</label>
+          <input
+            type="text"
+            id="player2-name"
+            placeholder="Player 2 Name"
+            autocomplete="off"
+            autocapitalize="on"
+          />
+          <label>
+            <input type="checkbox" id="play-with-bot" /> Play with Bot
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="game-level">Select Level:</label>
+          <select id="game-level">
+            <option value="">Select Level</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div class="button-group">
+          <button id="play-game" class="play-game" disabled>Play Game</button>
+          <button class="instruction">Instruction</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hexaria-container" style="display: none">
+      <h1 class="hexaria-title">Hexaria</h1>
+      <div class="player-info">
+        <div id="player1-info">
+          Player 1: <span id="player1-name-display"></span>
+        </div>
+        <div id="player2-info">
+          Player 2: <span id="player2-name-display"></span>
+        </div>
+      </div>
+      <div class="game-controls">
+        <button id="new-game">New Game</button>
+        <button id="sort-score">Sort by Score</button>
+        <button class="instruction">Instruction</button>
+      </div>
+      <div id="hexaria-board" class="hexaria-board"></div>
+      <div id="current-hexagon">Current Hexagon:</div>
+      <div id="turn-indicator">Turn: <span id="current-turn"></span></div>
+      <div class="player-info">
+        <div id="player1-score">Player 1 Score: 0</div>
+        <div id="player2-score">Player 2 Score: 0</div>
+      </div>
+      <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <div id="leaderboard-content"></div>
+      </div>
+    </div>
+
+    <!-- Modal for Instructions -->
+    <div id="instruction-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>How To Play Hexaria</h2>
+        <ol>
+          <li>Input Player 1 and Player 2 names.</li>
+          <li>Select the game level (easy, medium, hard).</li>
+          <li>Click "New Game" to start the game.</li>
+          <li>Player 1 (red) takes the first turn.</li>
+          <li>Click on an empty hexagon to place your hexagon.</li>
+          <li>
+            Take over opponent's hexagons by placing a higher value hexagon
+            adjacent to them.
+          </li>
+          <li>The game ends when there are no empty hexagons left.</li>
+          <li>The player with the highest score wins.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Link ke file JavaScript -->
+    <script src="./assets/script.js"></script>
+  </body>
+</html>

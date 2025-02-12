@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landing Page</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f4f4f4;
+        min-height: 100vh;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+      }
+
+      /* Navbar Styling */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        padding: 1rem;
+        color: white;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 10;
+      }
+
+      .navbar .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .navbar .menu {
+        display: flex;
+        list-style: none;
+      }
+
+      .navbar .menu li {
+        margin-left: 1.5rem;
+        position: relative;
+      }
+
+      .navbar .menu li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+      }
+
+      .dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #444;
+        padding: 0.5rem;
+        list-style: none;
+        border-radius: 4px;
+        min-width: 150px;
+      }
+
+      .menu-item:hover .dropdown {
+        display: block;
+      }
+
+      .dropdown li {
+        margin: 0.5rem 0;
+      }
+
+      .dropdown li a {
+        color: white;
+        text-decoration: none;
+      }
+
+      /* Mobile Menu */
+      .menu-toggle {
+        display: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      /* Hero Section */
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: url("https://via.placeholder.com/1200x600") no-repeat center
+          center/cover;
+        color: black;
+        text-align: center;
+        padding: 2rem;
+        margin-top: 4rem;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .hero .cta-button {
+        background-color: #007bff;
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .hero .cta-button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .menu {
+          display: flex !important;
+          flex-direction: column;
+          width: 100%;
+          background-color: #333;
+          /* padding: 0 1rem; */
+          position: absolute;
+          top: 100%;
+          left: 0;
+          z-index: 9;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.5s ease-in-out;
+        }
+
+        .menu li {
+          margin: 0.5rem 0;
+        }
+
+        .menu-toggle {
+          display: block;
+          color: white;
+        }
+
+        /* Show menu when active */
+        .menu.active {
+          max-height: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="logo">MyLogo</div>
+      <div class="menu-toggle" onclick="toggleMenu()">&#9776;</div>
+      <ul class="menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li class="menu-item">
+          <a href="#services">Services</a>
+          <ul class="dropdown">
+            <li><a href="#design">Design</a></li>
+            <li><a href="#development">Development</a></li>
+            <li><a href="#marketing">Marketing</a></li>
+          </ul>
+        </li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div>
+        <h1>Welcome to Our Landing Page</h1>
+        <p>We create amazing web solutions for your business.</p>
+        <a href="#services" class="cta-button">Get Started</a>
+      </div>
+    </section>
+
+    <script>
+      function toggleMenu() {
+        const menu = document.querySelector(".menu");
+        if (menu.classList.contains("active")) {
+          menu.style.maxHeight = "0";
+          menu.classList.remove("active");
+        } else {
+          menu.style.maxHeight = menu.scrollHeight + "px";
+          menu.classList.add("active");
+        }
+      }
+
+      // Sembunyikan menu saat halaman dimuat (untuk tampilan mobile)
+      document.addEventListener("DOMContentLoaded", () => {
+        if (window.innerWidth <= 768) {
+          const menu = document.querySelector(".menu");
+          menu.style.maxHeight = "0";
+          menu.classList.remove("active");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  /* padding: 0 2rem; */
+  min-height: 100vh;
+}
+.container {
+  width: 90vmin;
+  display: grid;
+  grid-template-areas:
+    "one two three"
+    "one five three"
+    "one five four"
+    "six five seven"
+    "eight nine seven"
+    "eight nine seven";
+}
+
+.box {
+  min-height: 150px;
+  background-color: grey !important;
+  border: 1px solid #000;
+  margin: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white !important;
+  font-size: 2rem !important;
+}
+
+.one {
+  grid-area: one;
+}
+.two {
+  grid-area: two;
+}
+.three {
+  min-height: 200px !important;
+  grid-area: three;
+}
+.four {
+  grid-area: four;
+}
+.five {
+  grid-area: five;
+}
+.six {
+  grid-area: six;
+}
+.seven {
+  grid-area: seven;
+}
+.eight {
+  min-height: 200px !important;
+  grid-area: eight;
+}
+.nine {
+  min-height: 200px !important;
+  grid-area: nine;
+}
