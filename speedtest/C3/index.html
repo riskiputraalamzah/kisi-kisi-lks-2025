@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hidden Text Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f0f0f0;
+      }
+      .container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background-color: #000;
+      }
+      .hidden-text {
+        font-size: 50px;
+        color: white;
+        line-height: 1.5;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        transition: clip-path 0.1s ease-out; /* Animasi transisi clip-path */
+      }
+      .view-box {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border: 2px solid #fff;
+        cursor: grab;
+        backdrop-filter: brightness(2);
+        pointer-events: all; /* Agar kotak tetap bisa dipindahkan */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div
+        class="hidden-text"
+        style="clip-path: inset(0px 246px 228px 0px)"
+        id="hidden-text"
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed quam
+        vel urna cursus varius. Vivamus nec risus feugiat, tempor augue non,
+        pharetra velit. Integer sit amet massa justo.
+      </div>
+      <div class="view-box" id="view-box"></div>
+    </div>
+
+    <script>
+      const viewBox = document.getElementById("view-box");
+      const hiddenText = document.getElementById("hidden-text");
+      const container = document.querySelector(".container");
+
+      let isDragging = false;
+      let offsetX, offsetY;
+
+      // Fungsi untuk memulai dragging
+      viewBox.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+        viewBox.style.cursor = "grabbing";
+      });
+
+      // Fungsi untuk menghentikan dragging
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+        viewBox.style.cursor = "grab";
+      });
+
+      // Fungsi untuk menangani pergerakan kotak
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+
+        const rect = container.getBoundingClientRect();
+        let left = e.clientX - rect.left - offsetX;
+        let top = e.clientY - rect.top - offsetY;
+
+        // Pastikan kotak tetap berada di dalam container
+        left = Math.max(0, Math.min(left, rect.width - viewBox.offsetWidth));
+        top = Math.max(0, Math.min(top, rect.height - viewBox.offsetHeight));
+
+        viewBox.style.left = `${left}px`;
+        viewBox.style.top = `${top}px`;
+
+        // Update clip-path untuk hanya menampilkan teks yang berada di dalam kotak
+        updateClipPath();
+      });
+
+      // Fungsi untuk memperbarui clip-path pada teks berdasarkan posisi kotak
+      function updateClipPath() {
+        const rect = viewBox.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const left = rect.left - containerRect.left;
+        const top = rect.top - containerRect.top;
+        const right = containerRect.width - (left + rect.width);
+        const bottom = containerRect.height - (top + rect.height);
+
+        // Apply clip-path untuk hanya menampilkan teks dalam area kotak
+        hiddenText.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`;
+      }
+    </script>
+  </body>
+</html>
